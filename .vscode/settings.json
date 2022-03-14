@@ -1,0 +1,8 @@
+{
+  "terminal.integrated.inheritEnv": true,
+  "python.terminal.activateEnvironment": true,
+  "python.formatting.provider": "autopep8",
+  "terminal.integrated.env.osx": {
+		"PATH": ""
+  }
+}
