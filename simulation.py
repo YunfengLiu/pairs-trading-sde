@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def eular_sim(B0, mu, sigma, X0, k, theta, eta, rho, T, N=251):
+def eular_sim(B0, mu, sigma, X0, k, theta, eta, rho, T=1, N=251):
     dt = T/N
 
     B = np.ones(N+1) * B0
@@ -55,17 +55,24 @@ def h_t(T, k, gamma, eta, sigma, rho, theta):
     return h
 
 
-def portfolio(V0, B0, X0, r, T, k, gamma, eta, mu, sigma, rho, theta):
+def portfolio_process(A, B, X, V0, r, T, k, gamma, eta, sigma, rho, theta):
     h = h_t(T, k, gamma, eta, sigma, rho, theta)
     # V(t) daily rebalancing
     V_n = V0
     # Use 251 for yearly trading days, N is the total number of trading days in T years
     N = 251 * T
     dt = T / N
-    A, B, X = eular_sim(B0, mu, sigma, X0, k, theta, eta, rho, T, N)
+    V = np.zeros(N + 1)
+    V[0] = V_n
+    H = np.zeros(N)
+    # rolling over daily
     for n in range(N):
+        # current time
         t = n * dt
+        H[n] = h(t, X[n])
         V_new = V_n + V_n * (h(t, X[n])/A[n]) * (A[n+1] - A[n]) - V_n * \
             (h(t, X[n])/B[n]) * (B[n+1] - B[n]) + V_n * r * dt
         V_n = V_new
-    return V_n
+        V[n+1] = V_n
+
+    return (V, H)
